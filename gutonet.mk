@@ -82,7 +82,7 @@ codestyle_check: ${REQUIREMENTS_TEST}
 	${VIRTUALENV} pycodestyle ${PYTHON_MODULES} | sort -rn || echo ''
 
 flake_check: ${REQUIREMENTS_TEST}
-	${VIRTUALENV} flake8 ${PYTHON_MODULES} --ignore=F403,F401
+	${VIRTUALENV} flake8 ${PYTHON_MODULES} --ignore=F403,F401,W503
 
 blue_check: ${REQUIREMENTS_TEST}
 	${VIRTUALENV} blue --check ${PYTHON_MODULES}
