@@ -85,7 +85,7 @@ flake_check: ${REQUIREMENTS_TEST}
 	${VIRTUALENV} flake8 ${PYTHON_MODULES} --ignore=F403,F401
 
 blue_check: ${REQUIREMENTS_TEST}
-	${VIRTUALENV} blue --check ${PYTHON_MODULES} *.py
+	${VIRTUALENV} blue --check ${PYTHON_MODULES}
 
 bandit_check:
 	${VIRTUALENV} bandit -r $(PYTHON_MODULES)
@@ -96,7 +96,7 @@ ipdb_check:
 code_check: blue_check codestyle_check flake_check ipdb_check
 
 fix_style: ${REQUIREMENTS_TEST}
-	${VIRTUALENV} blue ${PYTHON_MODULES} *.py
+	${VIRTUALENV} blue ${PYTHON_MODULES}
 
 pdb: build ${REQUIREMENTS_TEST}
 	${VIRTUALENV} CI=1 py.test ${PYTHON_MODULES} -x --ff --pdb --ignore ${PYTHON_MODULES}/tests/integration
