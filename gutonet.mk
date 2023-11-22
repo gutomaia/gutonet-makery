@@ -93,7 +93,7 @@ bandit_check:
 ipdb_check:
 	@find ${PYTHON_MODULES} -regex .*\.py$ | xargs -I [] egrep -H -n 'print|ipdb' [] || echo ''
 
-code_check: blue_check codestyle_check flake_check ipdb_check
+code_check: blue_check codestyle_check flake_check bandit_check ipdb_check
 
 fix_style: ${REQUIREMENTS_TEST}
 	${VIRTUALENV} blue ${PYTHON_MODULES}
