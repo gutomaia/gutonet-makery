@@ -132,15 +132,18 @@ docs/changelog.rst: CHANGELOG.md ${REQUIREMENTS_TEST}
 	${VIRTUALENV} m2r CHANGELOG.md
 	mv CHANGELOG.rst $@
 
-docs/requirements_licenses.rst: requirements.txt
+docs/requirements_licenses.rst: pyproject.toml
 	@echo "Create requirements_venv at docs/_build: \c"
 	@mkdir -p docs/_build && cd docs/_build && virtualenv requirements_venv ${VIRTUALENV_ARGS}
 	${CHECK}
 	@echo "Upgrade pip at requirements_venv: \c"
 	@. docs/_build/requirements_venv/bin/activate; pip3 install pip --upgrade --quiet
 	${CHECK}
+	@echo "Upgrade poetry at requirements_venv: \c"
+	@. docs/_build/requirements_venv/bin/activate; pip3 install poetry --quiet
+	${CHECK}
 	@echo "Install requirements.txt at requirements_venv: \c"
-	@. docs/_build/requirements_venv/bin/activate; pip3 install -r requirements.txt --quiet
+	@. docs/_build/requirements_venv/bin/activate; poetry install --only-root
 	${CHECK}
 	@echo "Install pip-licenses at requirements_venv: \c"
 	@. docs/_build/requirements_venv/bin/activate; pip3 install pip-licenses --quiet
@@ -149,15 +152,18 @@ docs/requirements_licenses.rst: requirements.txt
 	@. docs/_build/requirements_venv/bin/activate; pip-licenses --format rst --output-file $@
 	${CHECK}
 
-docs/requirements_dev_licenses.rst: requirements_test.txt
+docs/requirements_dev_licenses.rst: pyproject.toml
 	@echo "Create requirements_dev_venv at docs/_build: \c"
 	@mkdir -p docs/_build && cd docs/_build && virtualenv requirements_dev_venv ${VIRTUALENV_ARGS}
 	${CHECK}
 	@echo "Upgrade pip at requirements_dev_venv: \c"
 	@. docs/_build/requirements_dev_venv/bin/activate; pip3 install pip --upgrade --quiet
 	${CHECK}
+	@echo "Upgrade poetry at requirements_dev_venv: \c"
+	@. docs/_build/requirements_dev_venv/bin/activate; pip3 install poetry --quiet
+	${CHECK}
 	@echo "Install requirements.txt at requirements_dev_venv: \c"
-	@. docs/_build/requirements_dev_venv/bin/activate; pip3 install -r requirements_test.txt --quiet
+	@. docs/_build/requirements_dev_venv/bin/activate; poetry install --only=dev --no-root
 	${CHECK}
 	@echo "Install pip-licenses at requirements_dev_venv: \c"
 	@. docs/_build/requirements_dev_venv/bin/activate; pip3 install pip-licenses --quiet
