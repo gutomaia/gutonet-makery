@@ -11,12 +11,16 @@ MAKEFILE_SCRIPT_PATH?=extras/makefiles
 OK?=\033[32m[OK]\033[39m
 FAIL?=\033[31m[FAIL]\033[39m
 CHECK?=@if [ $$? -eq 0 ]; then echo "${OK}"; else echo "${FAIL}" ; fi
-PLANTUML_VERSION?=1.2022.6
+PLANTUML_VERSION?=1.2025.2
 PLANTUML_JAR?=plantuml-${PLANTUML_VERSION}.jar
 MAKERY_REPOSITORY?=gutomaia/gutonet-makery
 MAKERY_REPOSITORY_BRANCH?=main
 MAKERY_BASE_URL?=https://raw.githubusercontent.com/${MAKERY_REPOSITORY}/${MAKERY_REPOSITORY_BRANCH}
 DEFAULT_BEHAVIOR?=test code_check
+
+BLACK_ARGS?= --skip-string-normalization --line-length 79
+FLAKE8_ARGS?= --ignore=W503 --per-file-ignores=\*/__init__.py\:F401,F403 --inline-quotes='single'
+ISORT_ARGS?= --profile=black
 
 ifeq "true" "${shell test -d docs && echo true}"
 DOCS_RST?=${shell find docs -type f -iname '*.rst'} docs/requirements_licenses.rst docs/requirements_dev_licenses.rst
@@ -82,21 +86,27 @@ codestyle_check: ${REQUIREMENTS_TEST}
 	${VIRTUALENV} pycodestyle ${PYTHON_MODULES} | sort -rn || echo ''
 
 flake_check: ${REQUIREMENTS_TEST}
-	${VIRTUALENV} flake8 ${PYTHON_MODULES} --ignore=W503 --per-file-ignores=\*/__init__.py\:F401,F403
+	${VIRTUALENV} flake8 ${PYTHON_MODULES} ${FLAKE8_ARGS}
 
-blue_check: ${REQUIREMENTS_TEST}
-	${VIRTUALENV} blue --check ${PYTHON_MODULES}
+black_check: ${REQUIREMENTS_TEST}
+	${VIRTUALENV} black ${BLACK_ARGS} --check ${PYTHON_MODULES}
 
 bandit_check:
 	${VIRTUALENV} bandit -r $(PYTHON_MODULES)
 
+isort_check:
+	${VIRTUALENV} isort ${PYTHON_MODULES} --check-only ${ISORT_ARGS}
+
 ipdb_check:
 	@find ${PYTHON_MODULES} -regex .*\.py$ | xargs -I [] egrep -H -n 'print|ipdb' [] || echo ''
 
-code_check: blue_check codestyle_check flake_check bandit_check ipdb_check
+code_check: black_check isort_check codestyle_check flake_check bandit_check ipdb_check
 
 fix_style: ${REQUIREMENTS_TEST}
-	${VIRTUALENV} blue ${PYTHON_MODULES}
+	${VIRTUALENV} black ${BLACK_ARGS} ${PYTHON_MODULES}
+
+fix_imports: ${REQUIREMENTS_TEST}
+	${VIRTUALENV} isort ${PYTHON_MODULES} ${ISORT_ARGS}
 
 pdb: build ${REQUIREMENTS_TEST}
 	${VIRTUALENV} CI=1 py.test ${PYTHON_MODULES} -x --ff --pdb --ignore ${PYTHON_MODULES}/tests/integration
