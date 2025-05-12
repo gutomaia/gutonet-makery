@@ -6,7 +6,7 @@ WGET?=curl -O -s -L -s
 GH_WGET?=${WGET} -H "Authorization: token ${GITHUB_TOKEN}"
 endif
 
-PYTHON_VERSION?=3.11
+PYTHON_VERSION?=3.12
 MAKEFILE_SCRIPT_PATH?=extras/makefiles
 OK?=\033[32m[OK]\033[39m
 FAIL?=\033[31m[FAIL]\033[39m
