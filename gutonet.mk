@@ -1,9 +1,18 @@
+PUBLIC_PROJECT?=false
 WGET?=wget -q
+ifeq "true" "${PUBLIC_PROJECT}"
+GH_WGET?=${WGET}
+else
 GH_WGET?=${WGET} --header "Authorization: token ${GITHUB_TOKEN}"
+endif
 
 ifeq "" "$(shell which wget)"
 WGET?=curl -O -s -L -s
+ifeq "true" "${PUBLIC_PROJECT}"
+GH_WGET?=${WGET}
+else
 GH_WGET?=${WGET} -H "Authorization: token ${GITHUB_TOKEN}"
+endif
 endif
 
 PYTHON_VERSION?=3.12
