@@ -19,7 +19,7 @@ MAKERY_BASE_URL?=https://raw.githubusercontent.com/${MAKERY_REPOSITORY}/${MAKERY
 DEFAULT_BEHAVIOR?=test code_check
 
 BLACK_ARGS?= --skip-string-normalization --line-length 79
-FLAKE8_ARGS?= --ignore=W503 --per-file-ignores=\*/__init__.py\:F401,F403 --inline-quotes='single'
+FLAKE8_ARGS?= --ignore=W503 --per-file-ignores=\*/__init__.py\:F401,F403
 ISORT_ARGS?= --profile=black
 
 ifeq "true" "${shell test -d docs && echo true}"
