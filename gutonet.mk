@@ -27,6 +27,7 @@ MAKERY_REPOSITORY_BRANCH?=main
 MAKERY_BASE_URL?=https://raw.githubusercontent.com/${MAKERY_REPOSITORY}/${MAKERY_REPOSITORY_BRANCH}
 DEFAULT_BEHAVIOR?=test code_check
 
+PYTEST_ARGS?=
 BLACK_ARGS?= --skip-string-normalization --line-length 79
 FLAKE8_ARGS?= --ignore=W503 --per-file-ignores=\*/__init__.py\:F401,F403
 ISORT_ARGS?= --profile=black
@@ -89,7 +90,7 @@ purge: python_purge
 build: python_build
 
 test: build ${REQUIREMENTS_TEST}
-	${VIRTUALENV} py.test ${PYTHON_MODULES} --ignore ${PYTHON_MODULES}/tests/integration
+	${VIRTUALENV} py.test ${PYTHON_MODULES} ${PYTEST_ARGS} --ignore ${PYTHON_MODULES}/tests/integration
 
 codestyle_check: ${REQUIREMENTS_TEST}
 	${VIRTUALENV} pycodestyle ${PYTHON_MODULES} | sort -rn || echo ''
@@ -118,17 +119,17 @@ fix_imports: ${REQUIREMENTS_TEST}
 	${VIRTUALENV} isort ${PYTHON_MODULES} ${ISORT_ARGS}
 
 pdb: build ${REQUIREMENTS_TEST}
-	${VIRTUALENV} CI=1 py.test ${PYTHON_MODULES} -x --ff --pdb --ignore ${PYTHON_MODULES}/tests/integration
+	${VIRTUALENV} CI=1 py.test ${PYTHON_MODULES} ${PYTEST_ARGS} -x --ff --pdb --ignore ${PYTHON_MODULES}/tests/integration
 
 ci:
 ifeq "true" "${TRAVIS}"
-	CI=1 py.test ${PYTHON_MODULES} --durations=10 --cov=${PYTHON_MODULES} ${PYTHON_MODULES}/tests/ --cov-config .coveragerc --cov-report=xml --junitxml=pytest-report.xml
+	CI=1 py.test ${PYTHON_MODULES} ${PYTEST_ARGS} --durations=10 --cov=${PYTHON_MODULES} ${PYTHON_MODULES}/tests/ --cov-config .coveragerc --cov-report=xml --junitxml=pytest-report.xml
 else
-	${VIRTUALENV} CI=1 py.test ${PYTHON_MODULES} --durations=10 --cov=${PYTHON_MODULES} ${PYTHON_MODULES}/tests/ --cov-config .coveragerc --cov-report=xml --junitxml=pytest-report.xml
+	${VIRTUALENV} CI=1 py.test ${PYTHON_MODULES} ${PYTEST_ARGS} --durations=10 --cov=${PYTHON_MODULES} ${PYTHON_MODULES}/tests/ --cov-config .coveragerc --cov-report=xml --junitxml=pytest-report.xml
 endif
 
 coverage: build ${REQUIREMENTS_TEST}
-	${VIRTUALENV} CI=1 py.test ${PYTHON_MODULES} --cov=${PYTHON_MODULES} ${PYTHON_MODULES}/tests/ --cov-config .coveragerc --cov-report term-missing --cov-report html:cov_html --cov-report xml:cov.xml --cov-report annotate:cov_annotate
+	${VIRTUALENV} CI=1 py.test ${PYTHON_MODULES} ${PYTEST_ARGS} --cov=${PYTHON_MODULES} ${PYTHON_MODULES}/tests/ --cov-config .coveragerc --cov-report term-missing --cov-report html:cov_html --cov-report xml:cov.xml --cov-report annotate:cov_annotate
 
 todo: ${REQUIREMENTS_TEST}
 	${VIRTUALENV} flake8 ${PYTHON_MODULES}
