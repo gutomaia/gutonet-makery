@@ -50,7 +50,10 @@ ${CHECKPOINT_DIR}/.python_develop: ${CHECKPOINT} setup.py
 	${VIRTUALENV} python setup.py develop && touch $@
 
 ifeq "true" "${shell test -f pyproject.toml && echo true}"
-${REQUIREMENTS}: ${CHECKPOINT} ${VIRTUALENV_ACTIVATE} ${CHECKPOINT_DIR}/.poetry pyproject.toml
+poetry.lock: pyproject.toml
+	${VIRTUALENV} poetry lock
+
+${REQUIREMENTS}: ${CHECKPOINT} ${VIRTUALENV_ACTIVATE} ${CHECKPOINT_DIR}/.poetry poetry.lock
 	${VIRTUALENV} poetry install && touch $@
 
 ${REQUIREMENTS_TEST}: ${REQUIREMENTS}
