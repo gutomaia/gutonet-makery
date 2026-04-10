@@ -37,10 +37,18 @@ ${CHECKPOINT_DIR}/.pip_tools: ${CHECKPOINT} ${VIRTUALENV_ACTIVATE}
 ${CHECKPOINT_DIR}/.upgrade_pip: ${CHECKPOINT} ${VIRTUALENV_ACTIVATE}
 	${VIRTUALENV} pip install pip --upgrade && touch $@
 
-requirements.txt: ${CHECKPOINT_DIR}/.upgrade_pip ${CHECKPOINT_DIR}/.pip_tools requirements.in
+${CHECKPOINT_DIR}/.upgrade_packaging: ${CHECKPOINT} ${VIRTUALENV_ACTIVATE}
+	${VIRTUALENV} pip install packaging --upgrade && touch $@
+
+${CHECKPOINT_DIR}/.upgrade_setuptools: ${CHECKPOINT} ${VIRTUALENV_ACTIVATE}
+	${VIRTUALENV} pip install setuptools --upgrade && touch $@
+
+prepare_venv: ${CHECKPOINT_DIR}/.upgrade_pip ${CHECKPOINT_DIR}/.pip_tools ${CHECKPOINT_DIR}/.upgrade_packaging ${CHECKPOINT_DIR}/.upgrade_setuptools
+
+requirements.txt: prepare_venv requirements.in
 	${VIRTUALENV} pip-compile requirements.in ${PIP_EXTRA_PARAMS} --no-emit-index-url --no-header
 
-requirements_test.txt: ${CHECKPOINT_DIR}/.upgrade_pip ${CHECKPOINT_DIR}/.pip_tools requirements_test.in
+requirements_test.txt: prepare_venv requirements_test.in
 	${VIRTUALENV} pip-compile requirements_test.in ${PIP_EXTRA_PARAMS} --no-emit-index-url --no-header
 
 ${CHECKPOINT_DIR}/.poetry: ${CHECKPOINT} ${VIRTUALENV_ACTIVATE} ${CHECKPOINT_DIR}/.upgrade_pip
