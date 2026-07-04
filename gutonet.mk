@@ -92,19 +92,79 @@ build: python_build
 test: build ${REQUIREMENTS_TEST}
 	${VIRTUALENV} py.test ${PYTHON_MODULES} ${PYTEST_ARGS} --ignore ${PYTHON_MODULES}/tests/integration
 
-codestyle_check: ${REQUIREMENTS_TEST}
+${CHECKPOINT_DIR}/codestyle_check_installed.check:
+ifeq "true" "${shell test -f pyproject.toml && echo true}"
+ifeq "" "${shell grep pycodestyle pyproject.toml}"
+	@echo "pycodestyle not found in pyproject.toml, adding as dev dependency: \c"
+	${VIRTUALENV} poetry add --group dev pycodestyle --quiet
+	${CHECK}
+else
+	@echo "pycodestyle already installed ${OK}"
+endif
+endif
+	touch $@
+
+codestyle_check: ${CHECKPOINT_DIR}/codestyle_check_installed.check ${REQUIREMENTS_TEST}
 	${VIRTUALENV} pycodestyle ${PYTHON_MODULES} | sort -rn || echo ''
 
-flake_check: ${REQUIREMENTS_TEST}
+${CHECKPOINT_DIR}/flake_check_installed.check:
+ifeq "true" "${shell test -f pyproject.toml && echo true}"
+ifeq "" "${shell grep flake pyproject.toml}"
+	@echo "flake not found in pyproject.toml, adding as dev dependency: \c"
+	${VIRTUALENV} poetry add --group dev flake --quiet
+	${CHECK}
+else
+	@echo "flake already installed ${OK}"
+endif
+endif
+	touch ${CHECKPOINT_DIR}/flake_check_installed.check
+
+flake_check: ${CHECKPOINT_DIR}/flake_check_installed.check ${REQUIREMENTS_TEST}
 	${VIRTUALENV} flake8 ${PYTHON_MODULES} ${FLAKE8_ARGS}
 
-black_check: ${REQUIREMENTS_TEST}
+${CHECKPOINT_DIR}/black_check_installed.check:
+ifeq "true" "${shell test -f pyproject.toml && echo true}"
+ifeq "" "${shell grep black pyproject.toml}"
+	@echo "black not found in pyproject.toml, adding as dev dependency: \c"
+	${VIRTUALENV} poetry add --group dev black --quiet
+	${CHECK}
+else
+	@echo "black already installed ${OK}"
+endif
+endif
+	touch $@
+
+black_check: ${CHECKPOINT_DIR}/black_check_installed.check ${REQUIREMENTS_TEST}
 	${VIRTUALENV} black ${BLACK_ARGS} --check ${PYTHON_MODULES}
 
-bandit_check:
+${CHECKPOINT_DIR}/bandit_check_installed.check:
+ifeq "true" "${shell test -f pyproject.toml && echo true}"
+ifeq "" "${shell grep bandit pyproject.toml}"
+	@echo "bandit not found in pyproject.toml, adding as dev dependency: \c"
+	${VIRTUALENV} poetry add --group dev bandit --quiet
+	${CHECK}
+else
+	@echo "bandit already installed ${OK}"
+endif
+endif
+	touch $@
+
+bandit_check: ${CHECKPOINT_DIR}/bandit_check_installed.check ${REQUIREMENTS_TEST}
 	${VIRTUALENV} bandit -r $(PYTHON_MODULES)
 
-isort_check:
+${CHECKPOINT_DIR}/isort_check_installed.check:
+ifeq "true" "${shell test -f pyproject.toml && echo true}"
+ifeq "" "${shell grep isort pyproject.toml}"
+	@echo "isort not found in pyproject.toml, adding as dev dependency: \c"
+	${VIRTUALENV} poetry add --group dev isort --quiet
+	${CHECK}
+else
+	@echo "isort already installed ${OK}"
+endif
+endif
+	touch $@
+
+isort_check: ${CHECKPOINT_DIR}/isort_check_installed.check ${REQUIREMENTS_TEST}
 	${VIRTUALENV} isort ${PYTHON_MODULES} --check-only ${ISORT_ARGS}
 
 ipdb_check:
